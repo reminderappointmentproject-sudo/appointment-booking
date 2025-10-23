@@ -17,6 +17,7 @@ import { SubmitRatingComponent } from './components/submit-rating/submit-rating.
 import { ProviderRatingsComponent } from './components/provider-ratings/provider-ratings.component';
 import { ProviderSearchComponent } from './components/provider-search/provider-search.component';
 import { AdminRatingsComponent } from './components/admin-ratings/admin-ratings.component'; // ✅ ADD THIS
+import { PaymentComponent } from './components/payment/payment.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -50,6 +51,6 @@ export const routes: Routes = [
   { path: 'admin/user/:id/appointments', component: UserAppointmentsComponent },
   { path: 'admin/appointment/:id', component: AppointmentDetailsComponent },
   { path: 'admin/profile', component: ProfileComponent },
-  
+  { path: 'customer/payment/:id', component: PaymentComponent },
   { path: '**', redirectTo: '/login' }
 ];

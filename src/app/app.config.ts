@@ -6,7 +6,7 @@ import { routes } from './app.routes';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider'; // ADD THIS
-
+import { MatTooltipModule } from '@angular/material/tooltip'; 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),

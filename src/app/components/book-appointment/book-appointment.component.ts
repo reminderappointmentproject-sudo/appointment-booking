@@ -10,11 +10,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AppointmentService } from '../../services/appointment.service';
 import { ServiceProvider } from '../../models/user.model';
-import { MatIconModule } from '@angular/material/icon'; // ADD THIS
+
 @Component({
   selector: 'app-book-appointment',
   standalone: true,
@@ -30,16 +31,18 @@ import { MatIconModule } from '@angular/material/icon'; // ADD THIS
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
-    MatIconModule 
+    MatIconModule
   ],
   template: `
     <div class="container">
       <mat-card class="booking-card">
         <mat-card-header>
           <mat-card-title>Book New Appointment</mat-card-title>
-          <mat-card-subtitle *ngIf="selectedProvider">
-            Booking with: {{selectedProvider.firstName}} {{selectedProvider.lastName}}
-          </mat-card-subtitle>
+          @if (selectedProvider) {
+            <mat-card-subtitle>
+              Booking with: {{selectedProvider.firstName}} {{selectedProvider.lastName}}
+            </mat-card-subtitle>
+          }
         </mat-card-header>
         
         <mat-card-content>
@@ -55,22 +58,24 @@ import { MatIconModule } from '@angular/material/icon'; // ADD THIS
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Select Service Provider</mat-label>
               <mat-select formControlName="providerId" (selectionChange)="onProviderChange($event)">
-                <mat-option *ngFor="let provider of serviceProviders" [value]="provider.id">
-                  {{provider.firstName}} {{provider.lastName}} - {{provider.serviceType}}
-                </mat-option>
+                @for (provider of serviceProviders; track provider.id) {
+                  <mat-option [value]="provider.id">
+                    {{provider.firstName}} {{provider.lastName}} - {{provider.serviceType}}
+                  </mat-option>
+                }
               </mat-select>
-              <mat-error *ngIf="bookingForm.get('providerId')?.hasError('required')">
-                Please select a service provider
-              </mat-error>
+              @if (bookingForm.get('providerId')?.hasError('required')) {
+                <mat-error>Please select a service provider</mat-error>
+              }
             </mat-form-field>
 
             <!-- Service Type -->
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Service Type</mat-label>
               <input matInput formControlName="serviceType">
-              <mat-error *ngIf="bookingForm.get('serviceType')?.hasError('required')">
-                Service type is required
-              </mat-error>
+              @if (bookingForm.get('serviceType')?.hasError('required')) {
+                <mat-error>Service type is required</mat-error>
+              }
             </mat-form-field>
 
             <!-- Date and Time -->
@@ -80,17 +85,17 @@ import { MatIconModule } from '@angular/material/icon'; // ADD THIS
                 <input matInput [matDatepicker]="picker" formControlName="appointmentDate">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
-                <mat-error *ngIf="bookingForm.get('appointmentDate')?.hasError('required')">
-                  Date is required
-                </mat-error>
+                @if (bookingForm.get('appointmentDate')?.hasError('required')) {
+                  <mat-error>Date is required</mat-error>
+                }
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="half-width">
                 <mat-label>Time</mat-label>
                 <input matInput type="time" formControlName="appointmentTime">
-                <mat-error *ngIf="bookingForm.get('appointmentTime')?.hasError('required')">
-                  Time is required
-                </mat-error>
+                @if (bookingForm.get('appointmentTime')?.hasError('required')) {
+                  <mat-error>Time is required</mat-error>
+                }
               </mat-form-field>
             </div>
 
@@ -98,9 +103,9 @@ import { MatIconModule } from '@angular/material/icon'; // ADD THIS
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Duration (minutes)</mat-label>
               <input matInput type="number" formControlName="duration" min="15" max="240">
-              <mat-error *ngIf="bookingForm.get('duration')?.hasError('required')">
-                Duration is required
-              </mat-error>
+              @if (bookingForm.get('duration')?.hasError('required')) {
+                <mat-error>Duration is required</mat-error>
+              }
             </mat-form-field>
 
             <!-- Notes -->
@@ -259,8 +264,12 @@ export class BookAppointmentComponent implements OnInit {
 
       this.appointmentService.bookAppointment(bookingData).subscribe({
         next: (appointment) => {
-          this.snackBar.open('Appointment booked successfully!', 'Close', { duration: 5000 });
-          this.router.navigate(['/customer/dashboard']);
+          this.snackBar.open('Appointment booked successfully! Redirecting to payment...', 'Close', { duration: 3000 });
+          
+          // Redirect to payment page instead of dashboard
+          setTimeout(() => {
+            this.router.navigate(['/customer/payment', appointment.id]);
+          }, 2000);
         },
         error: (error) => {
           this.loading = false;
